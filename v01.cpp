@@ -87,5 +87,5 @@ int main()
         else
         cout << setw(26) << std::setprecision(3) << (float(mokinys1.hw[(size + 1) / 2] + mokinys1.hw[(size - 1) / 2]) / 2);
     }
-    
+    delete[] mokinys1.hw;
 }
