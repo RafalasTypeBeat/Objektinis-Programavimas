@@ -110,7 +110,7 @@ void input(mokinys* mok, int i)
 
             for (int l = 0; l < i; l++)
                 mok[l] = temp[l];
-            delete[] temp;
+            delete[] temp;  //delete temp
         }
     }
 }
