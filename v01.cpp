@@ -19,27 +19,27 @@ struct mokinys
 };
 
 
-void input(mokinys *mok, int &i);
-void print(int i, mokinys* mok);
+void input(struct mokinys *mok, int &i);
+// void print(int i,struct mokinys *mok);
 int randP();
 
 int main()
 {
-    mokinys* mok = new mokinys[1];
+    mokinys *mok;
+    mok = new mokinys[1];
     int temp, i = 0;
     input(mok, i);
-    print(i, mok);
     delete[] mok;
 }
 
-void input(mokinys *mok, int &i)
+void input(struct mokinys *mok, int &i)
 { 
-    mokinys* temp;
+    mokinys* temp = nullptr;
     int* tempI = nullptr; 
     int j;
     char outhw, outhwrand, outegzrand, outaddmok;
     i = 0;
-    while (outaddmok != 'N')
+    while (outaddmok != 'n')
     {
         j = 1;
         cout << "Iveskite mokinio varda: ";
@@ -70,9 +70,8 @@ void input(mokinys *mok, int &i)
                 cin>>mok[i].hw[f];
             }
         }
-        cout<<mok[i].size;
         outegzrand = '0';
-        cout << "Ar norite automatiskai generuoti egzmino rezultata?(T/N)";
+        cout << "Ar norite automatiskai generuoti egzmino rezultata?(t/n)";
         while (outegzrand != 't' && outegzrand != 'n') cin >> outegzrand;
         if (outegzrand == 't') mok[i].egzam = randP();
 
@@ -83,66 +82,61 @@ void input(mokinys *mok, int &i)
         }
 
         outaddmok = '0';
-        cout << "Ar norite prideti dar viena mokini?(T/N)? ";
+        cout << "Ar norite prideti dar viena mokini?(t/n)? ";
         while (outaddmok != 't' && outaddmok != 'n') cin >> outaddmok;
         if (outaddmok == 't')
         {
             temp = new mokinys[i + 1];
             for (int l = 0; l <= i; l++)
             {
-                temp[l].hw = new int [mok[l].size];
+                temp[l].hw = new int [mok[l].size];//allocate mem to arr in temp struct
                 temp[l] = mok[l];
                  for (int g = 0; g < mok[l].size; g++)
                 {
+                    
                     temp[l].hw[g] = mok[l].hw[g];
                 }
-                     //allocate mem to arr in temp struct
             }
            
             
-            // delete[] mok->hw;
             delete[] mok;
-            cout<<i;
             i++;
-            cout<<i;
             mok = new mokinys[i + 1];
-
+            
             for (int l = 0; l < i; l++)
             {
+                
                 mok[l].hw = new int[temp[l].size];
                 mok[l] = temp[l];
+                
                 for (int g = 0; g < mok[l].size; g++)
                 {
                     mok[l].hw[g] = temp[l].hw[g];
                 }
+                //delete[] temp[l].hw;
             }
-            // delete[] temp->hw;
+            
             delete[] temp;  //delete temp
         }
     }
-}
-
-void print(int i, mokinys* mok)
-{
-    cout<<i;
     cout << "Pavarde" << setw(15) << "Vardas" << setw(39) << "Galutinis (Vid.) / Galutinis (Med.)" <<endl;
     cout << "---------------------------------------------------------------------"<<endl;
-    double temp;
+    double calc;
     for (int j = 0; j <= i; j++)
     {
         cout <<  mok[j].name << setw(17) << mok[j].surename;
-        temp = 0;
+        calc = 0;
 
         for (int g = 0; g < mok[j].size; g++)
         {
-            temp += mok[j].hw[g];
+            calc += mok[j].hw[g];
         }
 
-        cout << setw(13) << std::setprecision(3) << (0.6 * mok[j].egzam + ((0.4 * temp) / mok[j].size));
+        cout << setw(13) << std::fixed <<std::setprecision(2) << (0.6 * mok[j].egzam + ((0.4 * calc) / mok[j].size));
         int vid = mok[j].size / 2;
         mok[j].mediana = mok[j].size % 2 == 0 ? (mok[j].hw[vid - 1] + mok[j].hw[vid]) / 2
                                               : mok[j].hw[vid];
-        cout << setw(17) << std::setprecision(3) << mok[j].mediana << endl;
+        cout << setw(20) <<std::fixed<< std::setprecision(2) << mok[j].mediana << endl;
     }
 }
 
