@@ -27,19 +27,21 @@ struct mokinys
     int size = 0;
     double mediana;
 };
-int randP(std::random_device rd);
+
 void input(vector<mokinys>& mok, int &vieta);
 void print(vector<mokinys> mok, int vieta);
 void read(vector<mokinys>& mok, int &vieta, ifstream &in);
 double mediana(vector<double> hw);
 double vidurkis(vector<double> hw);
+double galutinis(double egz, double hw);
+double galutinis(double egz, const vector<double>& hw, double (*kriterijus)(vector<double>) = mediana);
 
 int main()
 {
     vector<mokinys> mok;
     int vieta = 0, choice; 
     cout<<"Ar norite duomenis ivesti ranka ar skaityti is failo?(1/2)";
-    while(choice != 1 && choice!= 2)cin>>choice;
+    while(choice != 1 && choice!= 2)cin>>choice; 
     if (choice == 1)
     {
         input(mok, vieta);
@@ -51,6 +53,8 @@ int main()
     }
     print(mok, vieta);
 }
+
+
 
 void read(vector<mokinys>& mok, int &vieta, ifstream &in)
 {
@@ -88,6 +92,9 @@ void read(vector<mokinys>& mok, int &vieta, ifstream &in)
 
 void input(vector<mokinys>& mok, int &vieta)
 {
+    std::random_device rd;
+    std::mt19937 mt(rd());
+    std::uniform_int_distribution<int> dist(1, 10);
     char outhwrand, outegzrand, outaddmok;
     vieta = 0;
     int nd, ndsize, temprand;
@@ -107,8 +114,8 @@ void input(vector<mokinys>& mok, int &vieta)
             mok[vieta].size = 5;
             for (int g = 0; g < 5; g++)
             {
-
-                mok[vieta].hw.push_back(randP());
+                mok[vieta].hw.push_back(dist(mt));
+                cout<<mok[vieta].hw[g];
             }
         }
         else
@@ -126,7 +133,7 @@ void input(vector<mokinys>& mok, int &vieta)
         outegzrand = '0';
         cout << "Ar norite automatiskai generuoti egzmino rezultata?(t/n)";
         while (outegzrand != 't' && outegzrand != 'n') cin >> outegzrand;
-        if (outegzrand == 't') mok[vieta].egzam = randP();
+        if (outegzrand == 't') mok[vieta].egzam = dist(mt);
 
         else
         {
@@ -143,13 +150,13 @@ void input(vector<mokinys>& mok, int &vieta)
 
 void print(vector<mokinys> mok, int vieta)
 {
-    cout << "Vardas" << setw(15) << "Pavarde" << setw(39) << "Galutinis (Vid.) / Galutinis (Med.)" <<endl;
+    cout <<setw(15)<< "Vardas" << setw(15) << "Pavarde" << setw(45) << "Galutinis (Vid.) / Galutinis (Med.)" <<endl;
     cout << "---------------------------------------------------------------------"<<endl;
     for (int j = 0; j <= vieta; j++)
     {
-        cout <<  mok[j].name << setw(15) << mok[j].surename;
-        cout << setw(13) << std::fixed << std::setprecision(2) << vidurkis(mok[j].hw);
-        cout << setw(18) << std::fixed << std::setprecision(2) << mediana(mok[j].hw) << endl;
+        cout << setw(15) << mok[j].name << setw(15) << mok[j].surename;
+        cout << setw(14) << std::fixed << std::setprecision(2) << galutinis(mok[j].egzam, mok[j].hw, vidurkis);
+        cout << setw(19) << std::fixed << std::setprecision(2) << galutinis(mok[j].egzam, mok[j].hw, mediana) << endl;
     }
 }
 
@@ -171,9 +178,14 @@ double vidurkis(vector<double> hw)
     return std::accumulate(hw.begin(), hw.end(), 0.0) / hw.size();
 }
 
-int randP()
+double galutinis(double egz, double hw)
 {
-    std::mt19937 mt(static_cast<long unsigned int>(hrClock::now().time_since_epoch().count()));
-    std::uniform_int_distribution<int> dist(1, 10);
-    return dist(mt);
+    return 0.6 * egz + 0.4 * hw;
+}
+
+double galutinis(double egz, const vector<double>& hw, double (*kriterijus)(vector<double>))
+{
+    if(hw.size() == 0)
+        throw std::domain_error("Negalima skaiciuoti galutinio ivertinimo, nes nera namu darbu ivertinimu! ");
+    return galutinis(egz, kriterijus(hw));
 }
