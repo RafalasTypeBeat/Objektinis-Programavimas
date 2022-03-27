@@ -53,14 +53,14 @@ int main()
     }
     else
     {
-        ifstream in("kursiokai.txt");
+        ifstream in("kursiokai2.txt");
         in.ignore(999, '\n');
-        while (readData(cin, temp))
+        while (readData(in, temp))
         {
             mok.push_back(temp);
         }
         sort(mok.begin(), mok.end(), compareName);
-
+        in.close();
     }
     try
         {
