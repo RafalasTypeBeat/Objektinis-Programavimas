@@ -18,6 +18,7 @@ using std::ifstream;
 using std::ofstream;
 using std::vector;
 using hrClock = std::chrono::high_resolution_clock;
+using std::istream;
 
 struct mokinys
 {
@@ -39,6 +40,7 @@ double galutinis(double egz, const vector<double>& hw, double (*kriterijus)(vect
 int main()
 {
     vector<mokinys> mok;
+    mokinys temp;
     int vieta = 0, choice; 
     cout<<"Ar norite duomenis ivesti ranka ar skaityti is failo?(1/2)";
     while(choice != 1 && choice!= 2)cin>>choice; 
@@ -49,46 +51,84 @@ int main()
     else
     {
         ifstream in("kursiokai.txt");
-        read(mok, vieta, in);
+        while (readData(cin, temp))
+        {
+            mok.push_back(temp);
+        }
+        
+
     }
-    print(mok, vieta);
+    try
+        {
+            print(mok, vieta);
+        }
+        catch(std::domain_error)
+        {
+            cout<<endl<<"Privalote ivesti pazymius i vektoriu! ";
+            return 1;
+        }
+        return 0;
 }
 
 
-
-void read(vector<mokinys>& mok, int &vieta, ifstream &in)
+istream& readHw(istream& in, mokinys& temp)
 {
-    in.ignore(1000, '\n');
-    int pazSk, paz;
-    string test;
-    cout<<"Po kiek pazymiu turi mokiniai?: ";
-    cin>>pazSk;
-
-    while (!in.eof())
+    if(in)
     {
-
-        mok.push_back(mokinys());
-        if(in>>test)
+        temp.hw.clear();
+        double x, count = 0;
+        while(in >> x)
         {
-            mok[vieta].name = test;
-            in>>mok[vieta].surename;
-            in.clear();
-        }
-        else break;
-        mok[vieta].hw.clear();
-        for (int i = 0; i < pazSk; i++)
-        {
-            in>>paz;
-            mok[vieta].hw.push_back(paz);
-            //cout<<mok[vieta].hw[i];
-        }
-        in>>mok[vieta].egzam;
+            temp.hw.push_back(x);
+            count++;
+        } 
+        temp.egzam = temp.hw[count - 1];
+        temp.hw.erase(temp.hw.end() - 1);
         in.clear();
-        vieta++;
-        if(in.eof())break;
     }
-    in.close();
+    return in;
 }
+
+istream& readData(istream& in, mokinys& temp)
+{
+    in >> temp.name >> temp.surename;
+    readHw(in, temp);
+}
+
+
+// void read(vector<mokinys>& mok, int &vieta, ifstream &in)
+// {
+//     in.ignore(1000, '\n');
+//     int pazSk, paz;
+//     string test;
+//     cout<<"Po kiek pazymiu turi mokiniai?: ";
+//     cin>>pazSk;
+
+//     while (!in.eof())
+//     {
+
+//         mok.push_back(mokinys());
+//         if(in>>test)
+//         {
+//             mok[vieta].name = test;
+//             in>>mok[vieta].surename;
+//             in.clear();
+//         }
+//         else break;
+//         mok[vieta].hw.clear();
+//         for (int i = 0; i < pazSk; i++)
+//         {
+//             in>>paz;
+//             mok[vieta].hw.push_back(paz);
+//             //cout<<mok[vieta].hw[i];
+//         }
+//         in>>mok[vieta].egzam;
+//         in.clear();
+//         vieta++;
+//         if(in.eof())break;
+//     }
+//     in.close();
+// }
 
 void input(vector<mokinys>& mok, int &vieta)
 {
