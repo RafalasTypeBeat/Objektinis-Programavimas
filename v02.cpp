@@ -4,6 +4,10 @@
 #include <random>
 #include <vector>
 #include <fstream>
+#include <algorithm>
+#include <stdexcept>
+#include <numeric>
+#include <chrono>
 
 using std::string;
 using std::cin;
@@ -12,42 +16,47 @@ using std::setw;
 using std::endl;
 using std::ifstream;
 using std::ofstream;
+using std::vector;
+using hrClock = std::chrono::high_resolution_clock;
 
 struct mokinys
 {
     string name = "", surename = "";
-    std::vector<int> hw;
+    vector<double> hw;
     int egzam;
     int size = 0;
     double mediana;
 };
-int randP();
-void input(std::vector<mokinys>& mok, int &vieta);
-void print(std::vector<mokinys> mok, int vieta);
-void read(std::vector<mokinys>& mok, int &vieta, ifstream &in);
+int randP(std::random_device rd);
+void input(vector<mokinys>& mok, int &vieta);
+void print(vector<mokinys> mok, int vieta);
+void read(vector<mokinys>& mok, int &vieta, ifstream &in);
+double mediana(vector<double> hw);
+double vidurkis(vector<double> hw);
 
 int main()
 {
-    std::vector<mokinys> mok;
+    vector<mokinys> mok;
     int vieta = 0, choice; 
     cout<<"Ar norite duomenis ivesti ranka ar skaityti is failo?(1/2)";
     while(choice != 1 && choice!= 2)cin>>choice;
     if (choice == 1)
     {
         input(mok, vieta);
-        print(mok, vieta);
     }
     else
     {
         ifstream in("kursiokai.txt");
         read(mok, vieta, in);
     }
+    print(mok, vieta);
 }
 
-void read(std::vector<mokinys>& mok, int &vieta, ifstream &in)
+void read(vector<mokinys>& mok, int &vieta, ifstream &in)
 {
     in.ignore(1000, '\n');
     int pazSk, paz;
+    string test;
     cout<<"Po kiek pazymiu turi mokiniai?: ";
     cin>>pazSk;
 
@@ -55,15 +64,19 @@ void read(std::vector<mokinys>& mok, int &vieta, ifstream &in)
     {
 
         mok.push_back(mokinys());
-
-        in>>mok[vieta].name>>mok[vieta].surename;
-        if(!in)break;
+        if(in>>test)
+        {
+            mok[vieta].name = test;
+            in>>mok[vieta].surename;
+            in.clear();
+        }
+        else break;
         mok[vieta].hw.clear();
         for (int i = 0; i < pazSk; i++)
         {
             in>>paz;
             mok[vieta].hw.push_back(paz);
-            cout<<mok[vieta].hw[i];
+            //cout<<mok[vieta].hw[i];
         }
         in>>mok[vieta].egzam;
         in.clear();
@@ -73,11 +86,11 @@ void read(std::vector<mokinys>& mok, int &vieta, ifstream &in)
     in.close();
 }
 
-void input(std::vector<mokinys>& mok, int &vieta)
-{ 
-    char outhw, outhwrand, outegzrand, outaddmok;
+void input(vector<mokinys>& mok, int &vieta)
+{
+    char outhwrand, outegzrand, outaddmok;
     vieta = 0;
-    int nd, ndsize;
+    int nd, ndsize, temprand;
     while (outaddmok != 'n')
     {
         ndsize = 0;
@@ -94,6 +107,7 @@ void input(std::vector<mokinys>& mok, int &vieta)
             mok[vieta].size = 5;
             for (int g = 0; g < 5; g++)
             {
+
                 mok[vieta].hw.push_back(randP());
             }
         }
@@ -127,33 +141,39 @@ void input(std::vector<mokinys>& mok, int &vieta)
     }
 }
 
-void print(std::vector<mokinys> mok, int vieta)
+void print(vector<mokinys> mok, int vieta)
 {
-    cout << "Pavarde" << setw(15) << "Vardas" << setw(39) << "Galutinis (Vid.) / Galutinis (Med.)" <<endl;
+    cout << "Vardas" << setw(15) << "Pavarde" << setw(39) << "Galutinis (Vid.) / Galutinis (Med.)" <<endl;
     cout << "---------------------------------------------------------------------"<<endl;
-    double temp;
-    int vid;
     for (int j = 0; j <= vieta; j++)
     {
-        cout <<  mok[j].surename << setw(17) << mok[j].name;
-        temp = 0;
-
-        for (int g = 0; g < mok[j].size; g++)
-        {
-            temp += mok[j].hw[g];
-        }
-        cout << setw(13) << std::fixed << std::setprecision(2) << (0.6 * mok[j].egzam + ((0.4 * temp) / mok[j].size));
-        vid = mok[j].size / 2;
-        mok[j].mediana = mok[j].size % 2 == 0 ? (mok[j].hw[vid - 1] + mok[j].hw[vid]) / 2
-                                              : mok[j].hw[vid];
-        cout << setw(18) << std::fixed << std::setprecision(2) << mok[j].mediana << endl;
+        cout <<  mok[j].name << setw(15) << mok[j].surename;
+        cout << setw(13) << std::fixed << std::setprecision(2) << vidurkis(mok[j].hw);
+        cout << setw(18) << std::fixed << std::setprecision(2) << mediana(mok[j].hw) << endl;
     }
+}
+
+double mediana(vector<double> hw)
+{
+    typedef vector<int>::size_type vecSize;
+    vecSize size = hw.size();
+    if (size == 0)
+        throw std::domain_error("Negalima skaiciuoti medianos, kai vektorius tuscias! ");
+    sort(hw.begin(), hw.end());
+    vecSize vid = size / 2;
+    return size % 2 == 0 ? (hw[vid] + hw[vid - 1]) / 2 : hw[vid];
+}
+
+double vidurkis(vector<double> hw)
+{
+    if (hw.size() == 0)
+        throw std::domain_error("Negalima skaiciuoti vidurkio, kai vektorius tuscias! ");
+    return std::accumulate(hw.begin(), hw.end(), 0.0) / hw.size();
 }
 
 int randP()
 {
-    std::random_device rd;
-    std::mt19937 mt(rd());
+    std::mt19937 mt(static_cast<long unsigned int>(hrClock::now().time_since_epoch().count()));
     std::uniform_int_distribution<int> dist(1, 10);
     return dist(mt);
 }
