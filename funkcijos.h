@@ -23,7 +23,7 @@ using hrClock = std::chrono::high_resolution_clock;
 using std::istream;
 
 void input(vector<mokinys>& mok, int vieta);
-void print(vector<mokinys> mok);
+void print(vector<mokinys>& mok);
 istream& readHw(istream& in, mokinys& temp);
 istream& readData(istream& in, mokinys& temp);
 bool compareName(const mokinys&x , const mokinys& y);

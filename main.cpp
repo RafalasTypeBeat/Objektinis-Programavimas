@@ -17,6 +17,9 @@ int main()
     {
         auto start = hrClock::now();
         ifstream in("kursiokai3.txt");
+        if (!in){
+            cout<< "Failas neegzistuoja ! Patikrinkite faila ir bandykite is naujo."; return 1;
+        }
         in.ignore(999, '\n');
         while (readData(in, temp))
         {

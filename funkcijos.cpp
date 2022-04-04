@@ -12,7 +12,7 @@ istream& readHw(istream& in, mokinys& temp)
             count++;
         } 
         temp.egzam = temp.hw[count - 1];
-        temp.hw.erase(temp.hw.end() - 1);
+        temp.hw.pop_back();
         in.clear();
     }
     return in;
@@ -86,7 +86,7 @@ void input(vector<mokinys>& mok, int vieta)
     }
 }
 
-void print(vector<mokinys> mok)
+void print(vector<mokinys>& mok)
 {
     cout <<setw(15)<< "Vardas" << setw(15) << "Pavarde" << setw(45) << "Galutinis (Vid.) / Galutinis (Med.)" <<endl;
     cout << "---------------------------------------------------------------------"<<endl;
