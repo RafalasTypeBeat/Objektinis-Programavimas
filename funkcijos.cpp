@@ -131,6 +131,7 @@ double galutinis(double egz, const vector<double>& hw, double (*kriterijus)(vect
 
 void generate(int &FileSkc)
 {
+    cout<<"gen"<<endl;
     std::random_device rd;
     std::mt19937 mt(rd());
     std::uniform_int_distribution<int> dist(1, 10);
@@ -164,6 +165,7 @@ void generate(int &FileSkc)
         cout<<"Failu generavimas su "<< MokiniuSkc << " mokiniu uztruko: "<< duration.count()<<endl;
         cout<<"Jei norite generuoti faila su  "<< MokiniuSkc * 10<<" mokiniais iveskite 1." << endl;
         cin >> choice;
+        index ++;
     }
 }
 
