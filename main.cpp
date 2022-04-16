@@ -6,14 +6,14 @@ int main()
     vector<mokinys> mok;
     mokinys temp;
     int vieta = 0, choice; 
-    cout<<"Ar norite duomenis ivesti ranka ar skaityti is failo?(1/2)";
+    cout<<"Ar norite duomenis ivesti ranka, skaityti is failo ar generuoti?(1/2/3)";
     while(choice != 1 && choice!= 2)cin>>choice; 
     if (choice == 1)
     {
         input(mok, vieta);
         sort(mok.begin(), mok.end(), compareName);
     }
-    else
+    else if(choice == 2)
     {
         auto start = hrClock::now();
         ifstream in("kursiokai3.txt");
@@ -30,6 +30,11 @@ int main()
         auto stop = hrClock::now();
         auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
         cout<<duration.count()<<endl;
+    }
+    else
+    {
+        int FileSkc;
+        generate(FileSkc);
     }
     try
         {

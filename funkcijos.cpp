@@ -1,5 +1,6 @@
 #include "funkcijos.h"
 #include "mokiniai.h"
+
 istream& readHw(istream& in, mokinys& temp)
 {
     if(in)
@@ -126,4 +127,47 @@ double galutinis(double egz, const vector<double>& hw, double (*kriterijus)(vect
     if(hw.size() == 0)
         throw std::domain_error("Negalima skaiciuoti galutinio ivertinimo, nes nera namu darbu ivertinimu! ");
     return galutinis(egz, kriterijus(hw));
+}
+
+void generate(int &FileSkc)
+{
+    std::random_device rd;
+    std::mt19937 mt(rd());
+    std::uniform_int_distribution<int> dist(1, 10);
+    auto start = hrClock::now();
+    int MokiniuSkc = 100;
+    FileSkc = 0;
+    int choice = 1, index = 1;
+    while (choice == 1)
+    {
+        FileSkc ++;
+        MokiniuSkc *= 10;
+        stringstream pavadinimas;
+        pavadinimas << "kursiokai" << index << ".txt";
+        ofstream out(pavadinimas.str());
+        for (int i = 0; i < MokiniuSkc; i++)
+        {
+            stringstream name, lastname, output;
+            name << "Vardas" << i << " ";
+            lastname << "Pavarde" << i << " ";
+            output << name.str() << lastname.str();
+            for (int j = 0; j < 15; j++)
+            {
+                output << dist(mt) << " ";
+            }
+            output << endl;
+            out << output.str(); //iraso i faila
+        }
+        out.close();
+        auto stop = hrClock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
+        cout<<"Failu generavimas su "<< MokiniuSkc << " mokiniu uztruko: "<< duration.count()<<endl;
+        cout<<"Jei norite generuoti faila su  "<< MokiniuSkc * 10<<" mokiniais iveskite 1." << endl;
+        cin >> choice;
+    }
+}
+
+void printToFile()
+{
+    
 }

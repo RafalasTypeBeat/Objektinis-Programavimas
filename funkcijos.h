@@ -9,6 +9,7 @@
 #include <stdexcept>
 #include <numeric>
 #include <chrono>
+#include <sstream>
 #include "mokiniai.h"
 
 using std::string;
@@ -21,6 +22,7 @@ using std::ofstream;
 using std::vector;
 using hrClock = std::chrono::high_resolution_clock;
 using std::istream;
+using std::stringstream;
 
 void input(vector<mokinys>& mok, int vieta);
 void print(vector<mokinys>& mok);
@@ -31,3 +33,4 @@ double mediana(vector<double> hw);
 double vidurkis(vector<double> hw);
 double galutinis(double egz, double hw);
 double galutinis(double egz, const vector<double>& hw, double (*kriterijus)(vector<double>) = mediana);
+void generate(int &FileSkc);
