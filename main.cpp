@@ -12,6 +12,15 @@ int main()
     {
         input(mok, vieta);
         sort(mok.begin(), mok.end(), compareName);
+        try
+        {
+            print(mok);
+        }
+        catch(std::domain_error e)
+        {
+            cout<<endl<<e.what();
+        }
+        return 0;
     }
     else if(choice == 2)
     {
@@ -30,19 +39,19 @@ int main()
         auto stop = hrClock::now();
         auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
         cout<<duration.count()<<endl;
+        try
+        {
+            print(mok);
+        }
+        catch(std::domain_error e)
+        {
+            cout<<endl<<e.what();
+        }
+        return 0;
     }
     else
     {
         int FileSkc;
         generate(FileSkc);
     }
-    // try
-    //     {
-    //         print(mok);
-    //     }
-    //     catch(std::domain_error e)
-    //     {
-    //         cout<<endl<<e.what();
-    //     }
-    //     return 0;
 }

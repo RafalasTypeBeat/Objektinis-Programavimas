@@ -34,3 +34,5 @@ double vidurkis(vector<double> hw);
 double galutinis(double egz, double hw);
 double galutinis(double egz, const vector<double>& hw, double (*kriterijus)(vector<double>) = mediana);
 void generate(int &FileSkc);
+bool sortByGrades(double egz, const vector<double>& hw, double (*kriterijus)(vector<double>));
+vector<mokinys> sortByGrades(vector<mokinys>& mok);

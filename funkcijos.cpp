@@ -135,18 +135,19 @@ void generate(int &FileSkc)
     std::random_device rd;
     std::mt19937 mt(rd());
     std::uniform_int_distribution<int> dist(1, 10);
-    auto start = hrClock::now();
+    //auto start = hrClock::now();
     int MokiniuSkc = 100;
     FileSkc = 0;
     int choice = 1, index = 1;
     while (choice == 1)
     {
+        auto start = hrClock::now();
         FileSkc ++;
         MokiniuSkc *= 10;
         stringstream pavadinimas;
         pavadinimas << "kursiokai" << index << ".txt";
         ofstream out(pavadinimas.str());
-        for (int i = 0; i < MokiniuSkc; i++)
+        for (int i = 1; i <= MokiniuSkc; i++)
         {
             stringstream name, lastname, output;
             name << "Vardas" << i << " ";
@@ -161,15 +162,32 @@ void generate(int &FileSkc)
         }
         out.close();
         auto stop = hrClock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
-        cout<<"Failu generavimas su "<< MokiniuSkc << " mokiniu uztruko: "<< duration.count()<<endl;
+        //auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+        std::chrono::duration<double> diff = stop-start;
+        //duration /= 1000;
+        cout<<"Failu generavimas su "<< MokiniuSkc << " mokiniu uztruko: "<< std::setprecision(2) <<diff.count()<<" sekundziu."<<endl;
         cout<<"Jei norite generuoti faila su  "<< MokiniuSkc * 10<<" mokiniais iveskite 1." << endl;
         cin >> choice;
         index ++;
     }
 }
 
-void printToFile()
+bool failed(double egz, const vector<double>& hw, double (*kriterijus)(vector<double>))
 {
-    
+    if(hw.size() == 0)
+        throw std::domain_error("Negalima priskirti i grupe, nes nera namu darbu ivertinimu! ");
+    return galutinis(egz, kriterijus(hw)) > 5.0;
+}
+
+vector<mokinys> sortByGrades(vector<mokinys>& mok){
+    vector<mokinys> neislaike;
+    vector<mokinys>::iterator it = mok.begin();
+    while(it != mok.end()){
+        if(failed(...)){
+        neislaike.push_back(*it);
+        it = mok.erase(it);
+    }
+    else it++;
+    }
+    return neislaike;
 }
