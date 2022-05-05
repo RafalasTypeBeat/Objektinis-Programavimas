@@ -131,7 +131,6 @@ double galutinis(double egz, const vector<double>& hw, double (*kriterijus)(vect
 
 void generate(int &FileSkc)
 {
-    cout<<"gen"<<endl;
     std::random_device rd;
     std::mt19937 mt(rd());
     std::uniform_int_distribution<int> dist(1, 10);
@@ -170,24 +169,83 @@ void generate(int &FileSkc)
         cin >> choice;
         index ++;
     }
+    //failu rusiavimas
 }
 
-bool failed(double egz, const vector<double>& hw, double (*kriterijus)(vector<double>))
-{
-    if(hw.size() == 0)
-        throw std::domain_error("Negalima priskirti i grupe, nes nera namu darbu ivertinimu! ");
-    return galutinis(egz, kriterijus(hw)) > 5.0;
+bool gavoSkola(const mokinys& m, double (*kriterijus)(vector<double>) = mediana) {
+ return galutinis(m.egzam, m.hw, kriterijus) < 5.0;
 }
 
 vector<mokinys> sortByGrades(vector<mokinys>& mok){
     vector<mokinys> neislaike;
     vector<mokinys>::iterator it = mok.begin();
     while(it != mok.end()){
-        if(failed(...)){
+        if(gavoSkola(*it)){
         neislaike.push_back(*it);
         it = mok.erase(it);
     }
     else it++;
     }
     return neislaike;
+}
+
+void readAndSort(int FileSkc)
+{
+    //nuskaito is sugeneruotu failu ir sudeda i vectoriu
+    vector<mokinys> mok;
+    mokinys temp;
+    for(int i = 0;i < FileSkc; i++)
+    {
+    stringstream pavadinimas;
+    pavadinimas << "kursiokai" << i << ".txt"; //sukuria failo pavadinima
+    ifstream in(pavadinimas.str());
+    while (readData(in, temp))
+    {
+        mok.push_back(temp);
+    }
+    sort(mok.begin(), mok.end(), compareName);
+    in.close();
+    //nuskaito viena faila i vektoriu
+    writeSorted(sortByGrades(mok), mok, i);//rusiuoja pagal pazymius
+
+    }
+    
+}
+
+void writeSorted(vector<mokinys> &pass,vector<mokinys> &fail, int FileNr)
+{
+    stringstream nameFail, namePass;
+        nameFail << "neislaike" << FileNr << ".txt";
+        namePass << "islaike" << FileNr << ".txt";
+        ofstream outF(nameFail.str());
+        ofstream outP(namePass.str());
+        //sukuria du txt failus islaikiusiems ir neislaikiusiems
+        vector<mokinys>::iterator itP = pass.begin(); //islaike
+        vector<mokinys>::iterator itF = fail.begin(); //neislaike
+        while(itP != pass.end()){
+            stringstream name, lastname, output;
+            name << itP->name << " ";
+            lastname << itP->surename << " ";
+            output << name.str() << lastname.str();
+            for (int j = 0; j < 15; j++)
+            {
+                output << itP->hw[j] << " ";
+            }
+            output << endl;
+            outP << output.str(); //iraso i faila
+        }
+        while(itF != pass.end()){
+            stringstream name, lastname, output;
+            name << itF->name << " ";
+            lastname << itF->surename << " ";
+            output << name.str() << lastname.str();
+            for (int j = 0; j < 15; j++)
+            {
+                output << itF->hw[j] << " ";
+            }
+            output << endl;
+            outF << output.str(); //iraso i faila
+        }
+        outF.close();
+        outP.close();
 }

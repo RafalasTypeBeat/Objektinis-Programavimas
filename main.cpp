@@ -8,7 +8,7 @@ int main()
     int vieta = 0, choice; 
     cout<<"Ar norite duomenis ivesti ranka, skaityti is failo ar generuoti?(1/2/3)";
     while(choice != 1 && choice!= 2 && choice!= 3)cin>>choice; 
-    if (choice == 1)
+    if (choice == 1)//ivedimas ranka
     {
         input(mok, vieta);
         sort(mok.begin(), mok.end(), compareName);
@@ -22,7 +22,7 @@ int main()
         }
         return 0;
     }
-    else if(choice == 2)
+    else if(choice == 2)//skaitymas is failo
     {
         auto start = hrClock::now();
         ifstream in("kursiokai3.txt");
@@ -49,7 +49,7 @@ int main()
         }
         return 0;
     }
-    else
+    else //failu generavimas
     {
         int FileSkc;
         generate(FileSkc);
