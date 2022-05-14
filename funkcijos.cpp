@@ -131,16 +131,18 @@ double galutinis(double egz, const vector<double>& hw, double (*kriterijus)(vect
 
 void generate(int &FileSkc)
 {
+    //vector<mokinys> mok;
     std::random_device rd;
     std::mt19937 mt(rd());
     std::uniform_int_distribution<int> dist(1, 10);
     //auto start = hrClock::now();
+    //vector<mokinys>::iterator it = mok.begin();
     int MokiniuSkc = 100;
     FileSkc = 0;
     int choice = 1, index = 1;
     while (choice == 1)
     {
-        auto start = hrClock::now();
+        auto startGen = hrClock::now();
         FileSkc ++;
         MokiniuSkc *= 10;
         stringstream pavadinimas;
@@ -152,7 +154,7 @@ void generate(int &FileSkc)
             name << "Vardas" << i << " ";
             lastname << "Pavarde" << i << " ";
             output << name.str() << lastname.str();
-            for (int j = 0; j < 15; j++)
+            for (int j = 0; j < 3; j++)
             {
                 output << dist(mt) << " ";
             }
@@ -160,60 +162,83 @@ void generate(int &FileSkc)
             out << output.str(); //iraso i faila
         }
         out.close();
-        auto stop = hrClock::now();
-        //auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-        std::chrono::duration<double> diff = stop-start;
-        //duration /= 1000;
-        cout<<"Failu generavimas su "<< MokiniuSkc << " mokiniu uztruko: "<< std::setprecision(2) <<diff.count()<<" sekundziu."<<endl;
-        cout<<"Jei norite generuoti faila su  "<< MokiniuSkc * 10<<" mokiniais iveskite 1." << endl;
+        auto stopGen = hrClock::now();
+        std::chrono::duration<double> diffGen = stopGen-startGen;
+        cout<<"Failu generavimas su "<< MokiniuSkc << " mokiniu uztruko: "<< std::setprecision(2) <<diffGen.count()<<" sekundziu."<<endl;
+        cout<<"Jei norite generuoti faila su  "<< MokiniuSkc * 10<<" mokiniais iveskite 1. Jei ne, iveskite bet koki simoboli: " << endl;
         cin >> choice;
+        if(choice != 1)break;
         index ++;
     }
     //failu rusiavimas
+    readAndSort(FileSkc);
 }
 
-bool gavoSkola(const mokinys& m, double (*kriterijus)(vector<double>) = mediana) {
- return galutinis(m.egzam, m.hw, kriterijus) < 5.0;
+bool gavoSkola(vector<double> &hw, int egz)  {
+    double temp;//reiksme medianai saugoti
+    typedef vector<int>::size_type vecSize;
+    vecSize size = hw.size();
+    if (size == 0)
+        throw std::domain_error("Negalima skaiciuoti medianos, kai vektorius tuscias! ");
+    sort(hw.begin(), hw.end());
+    vecSize vid = size / 2;
+    temp = size % 2 == 0 ? (hw[vid] + hw[vid - 1]) / 2 : hw[vid];
+
+    return (0.6 * egz + 0.4 * temp) < 5.0;
 }
 
 vector<mokinys> sortByGrades(vector<mokinys>& mok){
     vector<mokinys> neislaike;
     vector<mokinys>::iterator it = mok.begin();
     while(it != mok.end()){
-        if(gavoSkola(*it)){
+        if(gavoSkola(it->hw, it->egzam)){
         neislaike.push_back(*it);
         it = mok.erase(it);
     }
-    else it++;
+    else ++it;
     }
     return neislaike;
 }
 
-void readAndSort(int FileSkc)
+void readAndSort(int FileSkc)//nuskaito is sugeneruotu failu ir sudeda i vectoriu
 {
-    //nuskaito is sugeneruotu failu ir sudeda i vectoriu
-    vector<mokinys> mok;
+    auto startRead = hrClock::now();
+    vector<mokinys> mok, fail;
     mokinys temp;
-    for(int i = 0;i < FileSkc; i++)
+    
+    for(int i = 1;i <= FileSkc; i++)
     {
+    mok.clear();
+    fail.clear();
     stringstream pavadinimas;
     pavadinimas << "kursiokai" << i << ".txt"; //sukuria failo pavadinima
     ifstream in(pavadinimas.str());
-    while (readData(in, temp))
+    int t = 0;
+    while (readData(in, temp))//nuskaito faila i vektoriu
     {
         mok.push_back(temp);
+        t++;
     }
-    sort(mok.begin(), mok.end(), compareName);
+    //sort(mok.begin(), mok.end(), compareName);
     in.close();
-    //nuskaito viena faila i vektoriu
-    writeSorted(sortByGrades(mok), mok, i);//rusiuoja pagal pazymius
 
+    auto stopRead = hrClock::now();
+    std::chrono::duration<double> diffRead = stopRead-startRead;
+    cout<<"Failo "<<pavadinimas.str()<<" nuskaitymas uztruko "<<std::setprecision(2) <<diffRead.count()<<" sekundziu."<<endl;
+
+    auto startSort = hrClock::now();
+    fail = sortByGrades(mok); //rusiavimas
+    auto stopSort = hrClock::now();
+    std::chrono::duration<double> diffSort = stopSort-startSort;
+    cout<<"Failo "<<pavadinimas.str()<<" rusiavimas uztruko "<<std::setprecision(2) <<diffSort.count()<<" sekundziu."<<endl;
+
+    writeSorted(fail, mok, i);//iraso i atskirus failus islaikiusius ir neislaikiusius
     }
-    
 }
 
-void writeSorted(vector<mokinys> &pass,vector<mokinys> &fail, int FileNr)
+void writeSorted(vector<mokinys> &fail,vector<mokinys> &pass, int FileNr)
 {
+    auto startWrite = hrClock::now();
     stringstream nameFail, namePass;
         nameFail << "neislaike" << FileNr << ".txt";
         namePass << "islaike" << FileNr << ".txt";
@@ -227,25 +252,33 @@ void writeSorted(vector<mokinys> &pass,vector<mokinys> &fail, int FileNr)
             name << itP->name << " ";
             lastname << itP->surename << " ";
             output << name.str() << lastname.str();
-            for (int j = 0; j < 15; j++)
+            for (int j = 0; j < 14; j++)
             {
                 output << itP->hw[j] << " ";
             }
+            output << itP->egzam;
             output << endl;
             outP << output.str(); //iraso i faila
+            itP++;
         }
-        while(itF != pass.end()){
+        while(itF != fail.end()){
             stringstream name, lastname, output;
             name << itF->name << " ";
             lastname << itF->surename << " ";
             output << name.str() << lastname.str();
-            for (int j = 0; j < 15; j++)
+            for (int j = 0; j < 14; j++)
             {
                 output << itF->hw[j] << " ";
             }
+            output << itF->egzam;
             output << endl;
             outF << output.str(); //iraso i faila
+            itF++;//pereina prie kito
         }
         outF.close();
         outP.close();
+         auto stopWrite = hrClock::now();
+        std::chrono::duration<double> difWrite = stopWrite-startWrite;
+        cout<<"Surusiuotu failu isvedimas uztruko "<<std::setprecision(2) <<difWrite.count()<<" sekundziu."<<endl;
+        cout<<"------------------------------"<<endl;
 }

@@ -3,6 +3,7 @@
 
 int main()
 {
+    auto ProgramosStart = hrClock::now();
     vector<mokinys> mok;
     mokinys temp;
     int vieta = 0, choice; 
@@ -54,4 +55,7 @@ int main()
         int FileSkc;
         generate(FileSkc);
     }
+    auto pabaiga = hrClock::now();
+    std::chrono::duration<double> trukme = pabaiga - ProgramosStart;
+    cout<<"Programa veike "<< std::setprecision(2) <<trukme.count()<<" sekundziu."<<endl;
 }
