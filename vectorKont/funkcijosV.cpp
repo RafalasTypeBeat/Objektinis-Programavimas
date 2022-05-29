@@ -187,25 +187,26 @@ bool gavoSkola(vector<double> &hw, int egz, double &mediana)  {
     return mediana < 5.0;
 }
 
-void sortByGrades(vector<mokinys>& mok, vector<mokinys> &fail, vector<mokinys> &pass){
-    vector<mokinys>::iterator it = mok.end()-1;
-    while(it != mok.begin()){
+
+vector<mokinys> sortByGrades(vector<mokinys>& mok){
+    vector<mokinys> neislaike;
+    vector<mokinys>::iterator it = mok.begin();
+    while(it != mok.end()){
         if(gavoSkola(it->hw, it->egzam, it->mediana)){
-        fail.push_back(*it);
-        it--;
+        neislaike.push_back(*it);
+        *it = mok.back();
+        mok.pop_back();
     }
-    else{
-    pass.push_back(*it);
-    it--;
+    else it++;
     }
-    mok.pop_back();
-    }
+    return neislaike;
 }
+
 
 void readAndSort(int FileSkc)//nuskaito is sugeneruotu failu ir sudeda i vectoriu
 {
     auto startRead = hrClock::now();
-    vector<mokinys> mok, fail, pass;
+    vector<mokinys> mok, fail;
     mokinys temp;
     
     for(int i = 1;i <= FileSkc; i++)
@@ -229,7 +230,7 @@ void readAndSort(int FileSkc)//nuskaito is sugeneruotu failu ir sudeda i vectori
     cout<<"Failo "<<pavadinimas.str()<<" nuskaitymas uztruko "<<std::setprecision(2) <<diffRead.count()<<" sekundziu."<<endl;
 
     auto startSort = hrClock::now();
-    sortByGrades(mok, fail, pass); //rusiavimas
+    fail = sortByGrades(mok); //rusiavimas
     auto stopSort = hrClock::now();
     std::chrono::duration<double> diffSort = stopSort-startSort;
     cout<<"Failo "<<pavadinimas.str()<<" rusiavimas uztruko "<<std::setprecision(2) <<diffSort.count()<<" sekundziu."<<endl;
